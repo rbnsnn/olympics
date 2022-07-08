@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/olympics/static/css/main.073c9b0a.css",
+    "main.js": "/olympics/static/js/main.d1c1814c.js",
+    "index.html": "/olympics/index.html",
+    "main.073c9b0a.css.map": "/olympics/static/css/main.073c9b0a.css.map",
+    "main.d1c1814c.js.map": "/olympics/static/js/main.d1c1814c.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.073c9b0a.css",
+    "static/js/main.d1c1814c.js"
+  ]
+}
