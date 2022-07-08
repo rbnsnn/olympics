@@ -4,12 +4,13 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Button from '@mui/material/Button'
+import DeleteData from './DeleteData'
 import { AiOutlineArrowUp, AiOutlineArrowDown } from 'react-icons/ai'
 
 import sortMedals from './sortData';
+import EditData from './EditData';
 
-const DataTable = ({ medals, handleDelete, handleEditOpen }: any) => {
+const DataTable = ({ medals, handleDelete, handleEdit }: any) => {
 
     const [sortBy, setSortBy] = useState<string>('goldMedalsDescending')
     const [active, setActive] = useState('goldDescending')
@@ -117,23 +118,10 @@ const DataTable = ({ medals, handleDelete, handleEditOpen }: any) => {
                         <TableCell align="center">{element.bronzeMedals}</TableCell>
                         <TableCell align="center">{element.totalMedals}</TableCell>
                         <TableCell align="center">
-                            <Button
-                                variant="contained"
-                                onClick={handleEditOpen}
-                                style={{ width: '50px' }}
-                            >
-                                Edit
-                            </Button>
+                            <EditData element={element} handleEdit={handleEdit} />
                         </TableCell>
                         <TableCell align="center">
-                            <Button
-                                color="secondary"
-                                variant="contained"
-                                onClick={() => handleDelete(element.chosenCountryCode)}
-                                style={{ width: '50px' }}
-                            >
-                                Delete
-                            </Button>
+                            <DeleteData element={element} handleDelete={handleDelete} />
                         </TableCell>
 
                     </TableRow>

@@ -1,4 +1,4 @@
-import { SyntheticEvent, useState } from 'react'
+import React, { SyntheticEvent, useState } from 'react'
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -7,7 +7,6 @@ import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography';
 import { countries } from '../countries'
 import DataTable from '../DataTable/DataTable'
-import EditData from './EditData';
 
 interface MedalDataType {
     chosenCountry: string,
@@ -23,45 +22,97 @@ const DataInput = () => {
 
     const [chosenCountry, setChosenCountry] = useState<string>('')
     const [chosenCountryCode, setChosenCountryCode] = useState<string>('')
-    const [goldMedals, setGoldMedals] = useState<number | ''>('')
-    const [silverMedals, setSilverMedals] = useState<number | ''>('')
-    const [bronzeMedals, setBronzeMedals] = useState<number | ''>('')
+    const [goldMedals, setGoldMedals] = useState<string>('')
+    const [silverMedals, setSilverMedals] = useState<string>('')
+    const [bronzeMedals, setBronzeMedals] = useState<string>('')
     const [autocompleteKey, setAutocompleteKey] = useState<number>(0)
 
-    const [editOpen, setEditOpen] = useState(false)
+    const [isCountryInvalid, setCountryInvalid] = useState<boolean | undefined>(undefined)
+    const [isGoldMedalsInvalid, setGoldMedalsInvalid] = useState<boolean | undefined>(false)
+    const [isSilverMedalsInvalid, setSilverMedalsInvalid] = useState<boolean | undefined>(false)
+    const [isBronzeMedalsInvalid, setBronzeMedalsInvalid] = useState<boolean | undefined>(false)
 
     const handleCountryChange = (event: any, value: any): void => {
         setChosenCountry(value?.name)
         setChosenCountryCode(value?.code)
+        setCountryInvalid(false)
     }
 
-    const handleMedalChange = (event: any): void => {
-        const { id, value }: { id: string, value: number } = event.target
+    const handleMedalChange: React.ChangeEventHandler<HTMLInputElement> = (event): void => {
+        const { id, value }: { id: string, value: string } = event.currentTarget
 
         switch (id) {
             case 'goldMedals':
+                if (Number(value) > 100) {
+                    setGoldMedals('100')
+                    return
+                }
+                if (parseInt(value, 10) < 0) {
+                    setGoldMedals('0')
+                    return
+                }
                 setGoldMedals(value)
+                setGoldMedalsInvalid(false)
                 break
 
             case 'silverMedals':
+                if (Number(value) > 100) {
+                    setSilverMedals('100')
+                    return
+                }
+                if (parseInt(value, 10) < 0) {
+                    setSilverMedals('0')
+                    return
+                }
                 setSilverMedals(value)
+                setSilverMedalsInvalid(false)
                 break
 
             case 'bronzeMedals':
+                if (Number(value) > 100) {
+                    setBronzeMedals('100')
+                    return
+                }
+                if (parseInt(value, 10) < 0) {
+                    setBronzeMedals('0')
+                    return
+                }
                 setBronzeMedals(value)
+                setBronzeMedalsInvalid(false)
                 break
         }
     }
 
-    const submitHandle = (event: SyntheticEvent) => {
-        event.preventDefault()
-        const exists = medalData.find(element => element.chosenCountryCode === chosenCountryCode)
-        if (exists) {
-            console.log('duplikat!')
-            return
+    const handleValidation = (): boolean => {
+        const exists = medalData.find((element: MedalDataType) => element.chosenCountryCode === chosenCountryCode)
+
+        if (exists || chosenCountry === '') {
+            setCountryInvalid(true)
+        }
+        if (goldMedals === '') {
+            setGoldMedalsInvalid(true)
+        }
+        if (silverMedals === '') {
+            setSilverMedalsInvalid(true)
+        }
+        if (bronzeMedals === '') {
+            setBronzeMedalsInvalid(true)
         }
 
-        if (goldMedals && silverMedals && bronzeMedals) {
+        console.log(isCountryInvalid, isGoldMedalsInvalid, isSilverMedalsInvalid, isGoldMedalsInvalid)
+
+        if (!isCountryInvalid && !isGoldMedalsInvalid && !isSilverMedalsInvalid && !isBronzeMedalsInvalid) {
+            return false
+        } else {
+            return true
+        }
+    }
+
+    const handleSubmit = (): void => {
+        const isEverythingValid = handleValidation()
+
+        console.log(isEverythingValid)
+        if (isEverythingValid) {
             const currentMedalData: MedalDataType = {
                 chosenCountry,
                 chosenCountryCode,
@@ -76,6 +127,7 @@ const DataInput = () => {
             ]))
 
             setChosenCountry('')
+            setChosenCountryCode('')
             setGoldMedals('')
             setSilverMedals('')
             setBronzeMedals('')
@@ -83,14 +135,30 @@ const DataInput = () => {
         }
     }
 
-    const handleDelete = (id: string) => {
+    const handleDelete = (id: string): void => {
         const medalDataAfterDelete = medalData.filter(element => element.chosenCountryCode !== id)
         setMedalData(medalDataAfterDelete)
     }
 
-    const handleEditOpen = () => {
-        console.log(editOpen)
-        setEditOpen(true)
+    const handleEdit = (editedElement: any): void => {
+        const medalDataAfterEdit = medalData.map(element => {
+            if (element.chosenCountryCode !== editedElement.chosenCountryCode) {
+                return element
+            }
+
+            const { chosenCountry, chosenCountryCode, goldMedals, silverMedals, bronzeMedals } = editedElement
+
+            return ({
+                chosenCountry,
+                chosenCountryCode,
+                goldMedals: Number(goldMedals),
+                silverMedals: Number(silverMedals),
+                bronzeMedals: Number(bronzeMedals),
+                totalMedals: Number(goldMedals) + Number(silverMedals) + Number(bronzeMedals)
+            })
+        })
+
+        setMedalData(medalDataAfterEdit)
     }
 
     return (
@@ -106,6 +174,7 @@ const DataInput = () => {
                 }}
             >
                 <Autocomplete
+                    disableClearable
                     onChange={handleCountryChange}
                     fullWidth
                     key={autocompleteKey}
@@ -128,6 +197,8 @@ const DataInput = () => {
                     )}
                     renderInput={(params) => (
                         <TextField
+                            error={isCountryInvalid}
+                            helperText={isCountryInvalid ? 'Invalid or already exists' : ''}
                             {...params}
                             value={chosenCountry}
                             label="Choose a country"
@@ -136,6 +207,8 @@ const DataInput = () => {
                 />
 
                 <TextField
+                    error={isGoldMedalsInvalid}
+                    helperText={isGoldMedalsInvalid ? 'Input field must not be empty' : ''}
                     onChange={handleMedalChange}
                     value={goldMedals}
                     type="number"
@@ -146,6 +219,8 @@ const DataInput = () => {
                     fullWidth
                 />
                 <TextField
+                    error={isSilverMedalsInvalid}
+                    helperText={isSilverMedalsInvalid ? 'Input field must not be empty' : ''}
                     onChange={handleMedalChange}
                     value={silverMedals}
                     type="number"
@@ -156,6 +231,8 @@ const DataInput = () => {
                     fullWidth
                 />
                 <TextField
+                    error={isBronzeMedalsInvalid}
+                    helperText={isBronzeMedalsInvalid ? 'Input field must not be empty' : ''}
                     onChange={handleMedalChange}
                     value={bronzeMedals}
                     type="number"
@@ -167,9 +244,10 @@ const DataInput = () => {
                 />
 
                 <Button
+                    sx={{ maxHeight: '55px' }}
                     variant="contained"
                     fullWidth
-                    onClick={submitHandle}
+                    onClick={handleSubmit}
                 >
                     Submit
                 </Button>
@@ -183,11 +261,9 @@ const DataInput = () => {
                         <Typography variant="h2" gutterBottom component="div">
                             Add some data...
                         </Typography> :
-                        <DataTable medals={medalData} handleDelete={handleDelete} handleEditOpen={handleEditOpen} />
+                        <DataTable medals={medalData} handleDelete={handleDelete} handleEdit={handleEdit} />
                 }
             </div>
-
-            <EditData isOpen={editOpen} setOpen={setEditOpen} />
         </div>
     )
 }
