@@ -3,7 +3,9 @@ import sortBySilverMedals from "./sortBySilverMedals"
 import sortByBronzeMedals from "./sortByBronzeMedals"
 import sortByTotalMedals from "./sortByTotalMedals"
 
-const sortMedals = (data: any, sortBy: any) => {
+import MedalDataType from '../../../types/MedalDataType'
+
+const sortMedals = (data: MedalDataType[], sortBy: string) => {
 
     switch (sortBy) {
         case 'goldMedalsDescending':

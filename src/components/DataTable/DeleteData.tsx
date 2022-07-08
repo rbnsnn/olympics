@@ -5,7 +5,9 @@ import DialogTitle from "@mui/material/DialogTitle"
 import DialogActions from "@mui/material/DialogActions"
 import Button from "@mui/material/Button"
 
-const DeleteData = ({ element, handleDelete }: any) => {
+import MedalDataType from '../../types/MedalDataType'
+
+const DeleteData = ({ element, handleDelete }: { element: MedalDataType, handleDelete: (id: string) => void }): JSX.Element => {
     const [open, setOpen] = useState<boolean>(false)
 
     const handleDeleteOpen = () => {

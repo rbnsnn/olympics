@@ -1,5 +1,7 @@
-const sortByTotalMedals = (data: any) => {
-    const sorted = data.sort((a: any, b: any) => {
+import MedalDataType from '../../../types/MedalDataType'
+
+const sortByTotalMedals = (data: MedalDataType[]): MedalDataType[] => {
+    const sorted = data.sort((a: MedalDataType, b: MedalDataType): number => {
 
         if (a.totalMedals > b.totalMedals) {
             return -1

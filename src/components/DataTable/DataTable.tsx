@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -10,10 +10,18 @@ import { AiOutlineArrowUp, AiOutlineArrowDown } from 'react-icons/ai'
 import sortMedals from './sortData';
 import EditData from './EditData';
 
-const DataTable = ({ medals, handleDelete, handleEdit }: any) => {
+import MedalDataType from '../../types/MedalDataType'
+
+interface Props {
+    medals: MedalDataType[],
+    handleDelete: (id: string) => void,
+    handleEdit: (editedElement: MedalDataType) => void
+}
+
+const DataTable = ({ medals, handleDelete, handleEdit }: Props): JSX.Element => {
 
     const [sortBy, setSortBy] = useState<string>('goldMedalsDescending')
-    const [active, setActive] = useState('goldDescending')
+    const [active, setActive] = useState<string>('goldDescending')
 
     const dataToDisplay = sortMedals(medals, sortBy)
 
@@ -97,7 +105,7 @@ const DataTable = ({ medals, handleDelete, handleEdit }: any) => {
                 </TableRow>
             </TableHead>
             <TableBody>
-                {dataToDisplay.map((element: any) => (
+                {dataToDisplay ? dataToDisplay.map((element: any) => (
                     <TableRow
                         key={element.chosenCountryCode}
                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -125,7 +133,7 @@ const DataTable = ({ medals, handleDelete, handleEdit }: any) => {
                         </TableCell>
 
                     </TableRow>
-                ))}
+                )) : null}
             </TableBody>
         </Table>
     )

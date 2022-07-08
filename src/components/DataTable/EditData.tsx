@@ -6,13 +6,18 @@ import DialogActions from "@mui/material/DialogActions"
 import TextField from "@mui/material/TextField"
 import Button from "@mui/material/Button"
 
+import MedalDataType from '../../types/MedalDataType'
 
-const EditData = ({ element, handleEdit }: any) => {
+const EditData = ({ element, handleEdit }: any): JSX.Element => {
     const [open, setOpen] = useState<boolean>(false)
 
     const [goldMedals, setGoldMedals] = useState<string>(element.goldMedals)
     const [silverMedals, setSilverMedals] = useState<string>(element.silverMedals)
     const [bronzeMedals, setBronzeMedals] = useState<string>(element.bronzeMedals)
+
+    const [isGoldMedalsInvalid, setGoldMedalsInvalid] = useState<boolean>(false)
+    const [isSilverMedalsInvalid, setSilverMedalsInvalid] = useState<boolean>(false)
+    const [isBronzeMedalsInvalid, setBronzeMedalsInvalid] = useState<boolean>(false)
 
     const handleMedalChange: React.ChangeEventHandler<HTMLInputElement> = (event): void => {
         const { id, value }: { id: string, value: string } = event.currentTarget
@@ -28,6 +33,7 @@ const EditData = ({ element, handleEdit }: any) => {
                     return
                 }
                 setGoldMedals(value)
+                setGoldMedalsInvalid(false)
                 break
 
             case 'silverMedals':
@@ -40,6 +46,7 @@ const EditData = ({ element, handleEdit }: any) => {
                     return
                 }
                 setSilverMedals(value)
+                setSilverMedalsInvalid(false)
                 break
 
             case 'bronzeMedals':
@@ -52,24 +59,71 @@ const EditData = ({ element, handleEdit }: any) => {
                     return
                 }
                 setBronzeMedals(value)
+                setBronzeMedalsInvalid(false)
                 break
         }
     }
 
-    const handleEditOpen = () => {
+    const handleMedalValidation: React.FocusEventHandler<HTMLInputElement> = (event): void => {
+        const { id, value }: { id: string, value: string } = event.currentTarget
+
+        switch (id) {
+            case 'goldMedals':
+                if (value === '') {
+                    setGoldMedalsInvalid(true)
+                } else {
+                    setGoldMedalsInvalid(false)
+                }
+                break
+            case 'silverMedals':
+                if (value === '') {
+                    setSilverMedalsInvalid(true)
+                } else {
+                    setSilverMedalsInvalid(false)
+                }
+                break
+            case 'bronzeMedals':
+                if (value === '') {
+                    setBronzeMedalsInvalid(true)
+                } else {
+                    setBronzeMedalsInvalid(false)
+                }
+                break
+        }
+    }
+
+    const handleEditOpen = (): void => {
         setOpen(true)
     }
-    const handleEditClose = () => {
+    const handleEditClose = (): void => {
         setOpen(false)
     }
 
-    const editedMedalData = {
-        chosenCountry: element.chosenCountry,
-        chosenCountryCode: element.chosenCountryCode,
-        goldMedals: Number(goldMedals),
-        silverMedals: Number(silverMedals),
-        bronzeMedals: Number(bronzeMedals),
-        totalMedals: Number(goldMedals) + Number(silverMedals) + Number(bronzeMedals)
+    const handleEditedMedalData = (): void | MedalDataType => {
+        if (goldMedals === '' || silverMedals === '' || bronzeMedals === '') {
+
+            if (goldMedals === '') {
+                setGoldMedalsInvalid(true)
+            }
+            if (silverMedals === '') {
+                setSilverMedalsInvalid(true)
+            }
+            if (bronzeMedals === '') {
+                setBronzeMedalsInvalid(true)
+            }
+
+        } else {
+            const editedMedalData = {
+                chosenCountry: element.chosenCountry,
+                chosenCountryCode: element.chosenCountryCode,
+                goldMedals: Number(goldMedals),
+                silverMedals: Number(silverMedals),
+                bronzeMedals: Number(bronzeMedals),
+                totalMedals: Number(goldMedals) + Number(silverMedals) + Number(bronzeMedals)
+            }
+            setOpen(false)
+            return editedMedalData
+        }
     }
 
     return (
@@ -90,6 +144,9 @@ const EditData = ({ element, handleEdit }: any) => {
                 <DialogContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '20px' }}>
                     <TextField
                         sx={{ marginTop: '20px' }}
+                        onBlur={handleMedalValidation}
+                        error={isGoldMedalsInvalid}
+                        helperText={isGoldMedalsInvalid ? 'Input field must not be empty' : ''}
                         onChange={handleMedalChange}
                         value={goldMedals}
                         type="number"
@@ -100,6 +157,9 @@ const EditData = ({ element, handleEdit }: any) => {
                         fullWidth
                     />
                     <TextField
+                        onBlur={handleMedalValidation}
+                        error={isSilverMedalsInvalid}
+                        helperText={isSilverMedalsInvalid ? 'Input field must not be empty' : ''}
                         onChange={handleMedalChange}
                         value={silverMedals}
                         type="number"
@@ -110,6 +170,9 @@ const EditData = ({ element, handleEdit }: any) => {
                         fullWidth
                     />
                     <TextField
+                        onBlur={handleMedalValidation}
+                        error={isBronzeMedalsInvalid}
+                        helperText={isBronzeMedalsInvalid ? 'Input field must not be empty' : ''}
                         onChange={handleMedalChange}
                         value={bronzeMedals}
                         type="number"
@@ -124,8 +187,7 @@ const EditData = ({ element, handleEdit }: any) => {
                 <DialogActions sx={{ display: 'flex', justifyContent: 'center' }}>
                     <Button variant="contained" onClick={handleEditClose}>Cancel</Button>
                     <Button variant="contained" color="secondary" onClick={() => {
-                        handleEdit(editedMedalData)
-                        setOpen(false)
+                        handleEdit(handleEditedMedalData())
                     }
                     } autoFocus>
                         Edit

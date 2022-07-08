@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useState } from 'react'
+import React, { useState } from 'react'
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -8,16 +8,9 @@ import Typography from '@mui/material/Typography';
 import { countries } from '../countries'
 import DataTable from '../DataTable/DataTable'
 
-interface MedalDataType {
-    chosenCountry: string,
-    chosenCountryCode: string,
-    goldMedals: number,
-    silverMedals: number,
-    bronzeMedals: number,
-    totalMedals: number
-}
+import MedalDataType from '../../types/MedalDataType'
 
-const DataInput = () => {
+const DataInput: React.FC = () => {
     const [medalData, setMedalData] = useState<MedalDataType[]>([])
 
     const [chosenCountry, setChosenCountry] = useState<string>('')
@@ -27,10 +20,10 @@ const DataInput = () => {
     const [bronzeMedals, setBronzeMedals] = useState<string>('')
     const [autocompleteKey, setAutocompleteKey] = useState<number>(0)
 
-    const [isCountryInvalid, setCountryInvalid] = useState<boolean | undefined>(undefined)
-    const [isGoldMedalsInvalid, setGoldMedalsInvalid] = useState<boolean | undefined>(false)
-    const [isSilverMedalsInvalid, setSilverMedalsInvalid] = useState<boolean | undefined>(false)
-    const [isBronzeMedalsInvalid, setBronzeMedalsInvalid] = useState<boolean | undefined>(false)
+    const [isCountryInvalid, setCountryInvalid] = useState<boolean>(false)
+    const [isGoldMedalsInvalid, setGoldMedalsInvalid] = useState<boolean>(false)
+    const [isSilverMedalsInvalid, setSilverMedalsInvalid] = useState<boolean>(false)
+    const [isBronzeMedalsInvalid, setBronzeMedalsInvalid] = useState<boolean>(false)
 
     const handleCountryChange = (event: any, value: any): void => {
         setChosenCountry(value?.name)
@@ -83,36 +76,60 @@ const DataInput = () => {
         }
     }
 
-    const handleValidation = (): boolean => {
+    const handleCountryValidation = (): void => {
         const exists = medalData.find((element: MedalDataType) => element.chosenCountryCode === chosenCountryCode)
-
         if (exists || chosenCountry === '') {
             setCountryInvalid(true)
-        }
-        if (goldMedals === '') {
-            setGoldMedalsInvalid(true)
-        }
-        if (silverMedals === '') {
-            setSilverMedalsInvalid(true)
-        }
-        if (bronzeMedals === '') {
-            setBronzeMedalsInvalid(true)
-        }
-
-        console.log(isCountryInvalid, isGoldMedalsInvalid, isSilverMedalsInvalid, isGoldMedalsInvalid)
-
-        if (!isCountryInvalid && !isGoldMedalsInvalid && !isSilverMedalsInvalid && !isBronzeMedalsInvalid) {
-            return false
         } else {
-            return true
+            setCountryInvalid(false)
+        }
+    }
+
+    const handleMedalValidation: React.FocusEventHandler<HTMLInputElement> = (event): void => {
+        const { id, value }: { id: string, value: string } = event.currentTarget
+
+        switch (id) {
+            case 'goldMedals':
+                if (value === '') {
+                    setGoldMedalsInvalid(true)
+                } else {
+                    setGoldMedalsInvalid(false)
+                }
+                break
+            case 'silverMedals':
+                if (value === '') {
+                    setSilverMedalsInvalid(true)
+                } else {
+                    setSilverMedalsInvalid(false)
+                }
+                break
+            case 'bronzeMedals':
+                if (value === '') {
+                    setBronzeMedalsInvalid(true)
+                } else {
+                    setBronzeMedalsInvalid(false)
+                }
+                break
         }
     }
 
     const handleSubmit = (): void => {
-        const isEverythingValid = handleValidation()
+        const exists = medalData.find((element: MedalDataType) => element.chosenCountryCode === chosenCountryCode)
+        if (exists || chosenCountry === '' || goldMedals === '' || silverMedals === '' || bronzeMedals === '') {
+            if (chosenCountry === '') {
+                setCountryInvalid(true)
+            }
+            if (goldMedals === '') {
+                setGoldMedalsInvalid(true)
+            }
+            if (silverMedals === '') {
+                setSilverMedalsInvalid(true)
+            }
+            if (bronzeMedals === '') {
+                setBronzeMedalsInvalid(true)
+            }
 
-        console.log(isEverythingValid)
-        if (isEverythingValid) {
+        } else {
             const currentMedalData: MedalDataType = {
                 chosenCountry,
                 chosenCountryCode,
@@ -132,6 +149,11 @@ const DataInput = () => {
             setSilverMedals('')
             setBronzeMedals('')
             setAutocompleteKey(prev => prev += 1)
+            setCountryInvalid(false)
+            setGoldMedalsInvalid(false)
+            setSilverMedalsInvalid(false)
+            setBronzeMedalsInvalid(false)
+
         }
     }
 
@@ -140,7 +162,7 @@ const DataInput = () => {
         setMedalData(medalDataAfterDelete)
     }
 
-    const handleEdit = (editedElement: any): void => {
+    const handleEdit = (editedElement: MedalDataType): void => {
         const medalDataAfterEdit = medalData.map(element => {
             if (element.chosenCountryCode !== editedElement.chosenCountryCode) {
                 return element
@@ -197,6 +219,7 @@ const DataInput = () => {
                     )}
                     renderInput={(params) => (
                         <TextField
+                            onBlur={handleCountryValidation}
                             error={isCountryInvalid}
                             helperText={isCountryInvalid ? 'Invalid or already exists' : ''}
                             {...params}
@@ -207,6 +230,7 @@ const DataInput = () => {
                 />
 
                 <TextField
+                    onBlur={handleMedalValidation}
                     error={isGoldMedalsInvalid}
                     helperText={isGoldMedalsInvalid ? 'Input field must not be empty' : ''}
                     onChange={handleMedalChange}
@@ -219,6 +243,7 @@ const DataInput = () => {
                     fullWidth
                 />
                 <TextField
+                    onBlur={handleMedalValidation}
                     error={isSilverMedalsInvalid}
                     helperText={isSilverMedalsInvalid ? 'Input field must not be empty' : ''}
                     onChange={handleMedalChange}
@@ -231,6 +256,7 @@ const DataInput = () => {
                     fullWidth
                 />
                 <TextField
+                    onBlur={handleMedalValidation}
                     error={isBronzeMedalsInvalid}
                     helperText={isBronzeMedalsInvalid ? 'Input field must not be empty' : ''}
                     onChange={handleMedalChange}
