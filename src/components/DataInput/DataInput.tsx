@@ -5,6 +5,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button'
 import { countries } from '../countries'
+import DataTable from '../DataTable/DataTable'
 
 interface MedalDataType {
     chosenCountry: string,
@@ -12,6 +13,7 @@ interface MedalDataType {
     goldMedals: number,
     silverMedals: number,
     bronzeMedals: number,
+    allMedals: number
 }
 
 const DataInput = () => {
@@ -55,14 +57,14 @@ const DataInput = () => {
             return
         }
 
-
         if (goldMedals && silverMedals && bronzeMedals) {
             const currentMedalData: MedalDataType = {
                 chosenCountry,
                 chosenCountryCode,
-                goldMedals,
-                silverMedals,
-                bronzeMedals
+                goldMedals: Number(goldMedals),
+                silverMedals: Number(silverMedals),
+                bronzeMedals: Number(bronzeMedals),
+                allMedals: Number(goldMedals) + Number(silverMedals) + Number(bronzeMedals)
             }
             setMedalData(prevMedalData => ([
                 ...prevMedalData,
@@ -74,14 +76,13 @@ const DataInput = () => {
             setSilverMedals('')
             setBronzeMedals('')
             setAutocompleteKey(prev => prev += 1)
-
-            console.log(autocompleteKey)
         }
-
-
     }
 
-    const elements = medalData.map(element => <p key={element.chosenCountryCode}>{element.chosenCountry}</p>)
+    const handleDelete = (id: string) => {
+        const medalDataAfterDelete = medalData.filter(element => element.chosenCountryCode !== id)
+        setMedalData(medalDataAfterDelete)
+    }
 
     return (
         <div>
@@ -167,7 +168,7 @@ const DataInput = () => {
 
 
             </FormControl>
-            {elements}
+            <DataTable medals={medalData} handleDelete={handleDelete} />
         </div>
     )
 }

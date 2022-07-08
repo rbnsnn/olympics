@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import DataInput from './DataInput/DataInput'
+import DataInput from './components/DataInput/DataInput'
 
 
 const App: React.FC = () => {
