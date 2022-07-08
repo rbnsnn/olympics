@@ -1,11 +1,13 @@
-import React, { SyntheticEvent, useState } from 'react'
+import { SyntheticEvent, useState } from 'react'
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button'
+import Typography from '@mui/material/Typography';
 import { countries } from '../countries'
 import DataTable from '../DataTable/DataTable'
+import EditData from './EditData';
 
 interface MedalDataType {
     chosenCountry: string,
@@ -13,7 +15,7 @@ interface MedalDataType {
     goldMedals: number,
     silverMedals: number,
     bronzeMedals: number,
-    allMedals: number
+    totalMedals: number
 }
 
 const DataInput = () => {
@@ -25,6 +27,8 @@ const DataInput = () => {
     const [silverMedals, setSilverMedals] = useState<number | ''>('')
     const [bronzeMedals, setBronzeMedals] = useState<number | ''>('')
     const [autocompleteKey, setAutocompleteKey] = useState<number>(0)
+
+    const [editOpen, setEditOpen] = useState(false)
 
     const handleCountryChange = (event: any, value: any): void => {
         setChosenCountry(value?.name)
@@ -64,7 +68,7 @@ const DataInput = () => {
                 goldMedals: Number(goldMedals),
                 silverMedals: Number(silverMedals),
                 bronzeMedals: Number(bronzeMedals),
-                allMedals: Number(goldMedals) + Number(silverMedals) + Number(bronzeMedals)
+                totalMedals: Number(goldMedals) + Number(silverMedals) + Number(bronzeMedals)
             }
             setMedalData(prevMedalData => ([
                 ...prevMedalData,
@@ -82,6 +86,11 @@ const DataInput = () => {
     const handleDelete = (id: string) => {
         const medalDataAfterDelete = medalData.filter(element => element.chosenCountryCode !== id)
         setMedalData(medalDataAfterDelete)
+    }
+
+    const handleEditOpen = () => {
+        console.log(editOpen)
+        setEditOpen(true)
     }
 
     return (
@@ -133,7 +142,7 @@ const DataInput = () => {
                     id="goldMedals"
                     label="Gold medals"
                     variant="outlined"
-                    InputProps={{ inputProps: { min: 0, max: 10 } }}
+                    InputProps={{ inputProps: { min: 0, max: 100 } }}
                     fullWidth
                 />
                 <TextField
@@ -143,7 +152,7 @@ const DataInput = () => {
                     id="silverMedals"
                     label="Silver medals"
                     variant="outlined"
-                    InputProps={{ inputProps: { min: 0, max: 10 } }}
+                    InputProps={{ inputProps: { min: 0, max: 100 } }}
                     fullWidth
                 />
                 <TextField
@@ -153,7 +162,7 @@ const DataInput = () => {
                     id="bronzeMedals"
                     label="Bronze medals"
                     variant="outlined"
-                    InputProps={{ inputProps: { min: 0, max: 10 } }}
+                    InputProps={{ inputProps: { min: 0, max: 100 } }}
                     fullWidth
                 />
 
@@ -168,7 +177,17 @@ const DataInput = () => {
 
 
             </FormControl>
-            <DataTable medals={medalData} handleDelete={handleDelete} />
+            <div>
+                {
+                    medalData.length === 0 ?
+                        <Typography variant="h2" gutterBottom component="div">
+                            Add some data...
+                        </Typography> :
+                        <DataTable medals={medalData} handleDelete={handleDelete} handleEditOpen={handleEditOpen} />
+                }
+            </div>
+
+            <EditData isOpen={editOpen} setOpen={setEditOpen} />
         </div>
     )
 }
